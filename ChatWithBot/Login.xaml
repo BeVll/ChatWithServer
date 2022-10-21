@@ -1,0 +1,27 @@
+﻿<Page x:Class="ChatWithBot.Login"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:ChatWithBot"
+      mc:Ignorable="d" 
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      d:MinHeight="578"  d:MinWidth="1000" 
+      Title="Chat">
+
+    <Grid Background="#2E3238">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.2*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="1.2*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+            <TextBlock Text="Login" FontSize="50" Foreground="#EFEFF0" FontWeight="Bold" HorizontalAlignment="Center"/>
+            <Border Height="3" Background="#EFEFF0" Margin="0,10,0,10"/>
+            <TextBox x:Name="Log" Style="{DynamicResource MaterialDesignOutlinedTextBox}" Padding="5" materialDesign:HintAssist.Hint="Login" Foreground="#EFEFF0" FontWeight="SemiBold" />
+            <TextBox x:Name="Pass" Style="{DynamicResource MaterialDesignOutlinedTextBox}" Padding="5" materialDesign:HintAssist.Hint="Password" Margin="0,10" Foreground="#EFEFF0" FontWeight="SemiBold" />
+            <Button x:Name="LogIn" Style="{DynamicResource MaterialDesignFlatDarkBgButton}" Content="Log in" Padding="0,-2,0,0" materialDesign:HintAssist.Hint="Password" Margin="0,0" Foreground="Black" FontWeight="SemiBold" Cursor="Hand" Click="LogIn_Click" />
+            <Button x:Name="SignUp" Style="{DynamicResource MaterialDesignOutlinedButton}" Content="Sign up" Padding="0,-2,0,0" materialDesign:HintAssist.Hint="Password" Margin="0,10,0,0" Foreground="#FAE63A" FontWeight="SemiBold" Cursor="Hand" Click="SignUp_Click" />
+        </StackPanel>
+    </Grid>
+</Page>

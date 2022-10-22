@@ -22,6 +22,13 @@ namespace Chat
             Client = tcpClient;
             Stream = networkStream;
         }
+        public UserServer(int id, TcpClient tcpClient, NetworkStream networkStream, Server server)
+        {
+            Id = id;
+            Client = tcpClient;
+            Stream = networkStream;
+            this.server = server;
+        }
         public string GetMessage()
         {
             try
@@ -33,19 +40,19 @@ namespace Chat
                     int bytes = Stream.Read(data_from_client, 0, data_from_client.Length);
                     string str = Encoding.Unicode.GetString(data_from_client);
                     str = str.Replace("\0", "");
-                    Regex regex = new Regex("(\\w+) //from (\\w+) to (\\w+)");
+                    Regex regex = new Regex("(\\w+) \\[from (\\w+)\\] \\[to (\\w+)\\]");
 
                     Match match = regex.Match(str);
-
-                    int id = Convert.ToInt32(match.Groups[3].Value);
-
-                    return "Disconnecting...The maximum number of requests has been reached";
+                    string mes = match.Groups[1].Value;
+                    int id_from = Convert.ToInt32(match.Groups[2].Value);
+                    int id_to = Convert.ToInt32(match.Groups[3].Value);
+                    server.SendMessage(mes, id_from, id_to);
+                    return str;
                 }
                 else
                 {
                     Client.Close();
                     Stream.Close();
-                    server.RemoveClient(this);
                     Log($"Server: User {Id} is disconnected!");
                     return $"Server: User {Id} is disconnected!";
                 }

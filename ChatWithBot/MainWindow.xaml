@@ -11,7 +11,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Grid Height="22" VerticalAlignment="Top" Background="#222831" MouseDown="Grid_MouseDown" >
+        <Grid Height="22" VerticalAlignment="Top" Background="#222831" MouseDown="Grid_MouseDown" Panel.ZIndex="1">
             <StackPanel Orientation="Horizontal">
                 <materialDesign:PackIcon Kind="FileDocument" Foreground="#D7EDF6" Margin="3,2,0,0"/>
                 <TextBlock Text="ChatApp" Foreground="#D7EDF6" VerticalAlignment="Center" FontWeight="SemiBold" Margin="3,0,0,0"/>
@@ -35,6 +35,6 @@
             
             </StackPanel>
         </Grid>
-        <Frame x:Name="pFrame" Grid.Column="0" Margin="0,22,0,0" NavigationUIVisibility="Hidden"/>
+        <Frame x:Name="pFrame" Grid.Column="0" Margin="0,22,0,0" NavigationUIVisibility="Hidden" Panel.ZIndex="0"/>
     </Grid>
 </Window>

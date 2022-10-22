@@ -15,11 +15,13 @@ namespace Chat
         private string address = "127.0.0.1";
         public User user;
         public TcpClient client = new TcpClient();
-        NetworkStream stream;
+        public NetworkStream stream;
         public string Connect(User user)
         {
+            
             try
             {
+                this.user = user;
                 client = new TcpClient();
                 client.Connect(IPAddress.Parse(address), port);
                 stream = client.GetStream();
@@ -52,7 +54,8 @@ namespace Chat
         {
             try
             {
-                byte[] data = Encoding.Unicode.GetBytes(message);
+                string mes = $"{message} [from {user.Id}] [to {id}]";
+                byte[] data = Encoding.Unicode.GetBytes(mes);
                 stream.Write(data, 0, data.Length);
             }
             catch (Exception ex)
@@ -74,27 +77,24 @@ namespace Chat
 
             }
         }
-        public string GetConnect()
+       
+        public string GetMessage()
         {
-            byte[] data = new byte[64];
-            StringBuilder builder = new StringBuilder();
-            int bytes = 0;
-            bytes = stream.Read(data, 0, data.Length);
-            builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-            return builder.ToString();
-        }
+            try
+            {
+                byte[] data = new byte[64];
+                StringBuilder builder = new StringBuilder();
+                int bytes = 0;
 
-        private string GetMessage()
-        {
-            byte[] data = new byte[64];
-            StringBuilder builder = new StringBuilder();
-            int bytes = 0;
-
-            bytes = stream.Read(data, 0, data.Length);
-            builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-
-
-            return builder.ToString();
+                bytes = stream.Read(data, 0, data.Length);
+                builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
+                return builder.ToString();
+            }
+            catch(Exception ex)
+            {
+                Log(ex.Message);
+                return "disconnected";
+            }
         }
         public void Close()
         {
@@ -106,4 +106,4 @@ namespace Chat
     }
 
 }
-}
+

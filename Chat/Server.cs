@@ -14,12 +14,13 @@ namespace Chat
         static TcpListener tcpListener; 
         private string Ip = "127.0.0.1";
         private int port = 8888;
-        public List<UserServer> users = new List<UserServer>();
+        public List<UserServer> users;
         public bool working = false;
         private DBConnector con = new DBConnector();
-
+        
         public void Start()
         {
+            users = new List<UserServer>();
             tcpListener = new TcpListener(IPAddress.Parse(Ip), port);
             tcpListener.Start();
             working = true;
@@ -50,7 +51,7 @@ namespace Chat
 
                     Match match = regex.Match(str);
                     int id = Convert.ToInt32(match.Groups[1].Value);
-                    UserServer userLocal = new UserServer(id, tcpClient, tmpStream);
+                    UserServer userLocal = new UserServer(id, tcpClient, tmpStream, this);
                     users.Add(userLocal);   
                     Log($"User {id} is connected!");
                 }
@@ -61,23 +62,38 @@ namespace Chat
             }
         }
 
-        
-        
 
 
-        public void SendMessage(string message, int id)
+        public void SendMessage(string message, int to_id)
         {
             try
             {
-                Log($"Server: {message} [to {clients.Where(s => s.Id == id).First().Login}]!");
+                Log($"Server: {message} [to {to_id}]!");
                 byte[] data = Encoding.Unicode.GetBytes(message);
-                clients.Where(s => s.Id == id).First().Stream.Write(data, 0, data.Length);
+                users.Where(s => s.Id == to_id).First().Stream.Write(data, 0, data.Length);
             }
             catch (Exception ex)
             {
                 Log($"SendMessage Error: {ex.Message}");
             }
         }
+
+        public void SendMessage(string message, int from_id, int to_id)
+        {
+            try
+            {
+                Log($"Server: {message} [to {to_id}] [from {from_id}]!");
+                string mes = $"{ message } [to { users.Where(s => s.Id == to_id).First().Id}] [from { from_id}]";
+                byte[] data = Encoding.Unicode.GetBytes(mes);
+                users.Where(s => s.Id == to_id).First().Stream.Write(data, 0, data.Length);
+            }
+            catch (Exception ex)
+            {
+                Log($"SendMessage Error: {ex.Message}");
+            }
+        }
+       
+        
         public void Log(string str)
         {
             lock (this)
@@ -92,24 +108,20 @@ namespace Chat
                 }
             }
         }
-        public void RemoveClient(UserServer user)
-        {
-            Thread.Sleep(100);
-            users.Remove(user);
-        }
+        
         public void Disconnect()
         {
             working = false;
-            for (int i = 0; i < clients.Count; i++)
+            for (int i = 0; i < users.Count; i++)
             {
-                SendMessage("Server is closed!", clients[i].Id);
+                SendMessage("Server is closed!", users[i].Id);
             }
             tcpListener.Stop();
 
-            for (int i = 0; i < clients.Count; i++)
+            for (int i = 0; i < users.Count; i++)
             {
-                clients[i].Stream.Close();
-                clients[i].Client.Close();
+                users[i].Stream.Close();
+                users[i].Client.Close();
             }
             Log("Server was stopped!");
             Environment.Exit(0);

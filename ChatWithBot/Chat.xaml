@@ -11,6 +11,7 @@
       Title="Chat">
     
     <Grid Background="#2E3238">
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="280"/>
             <ColumnDefinition Width="*"/>
@@ -54,8 +55,14 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="40"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
-                    <TextBlock x:Name="ts"/>
+            <Grid x:Name="NoCon" Height="40" VerticalAlignment="Top" Margin="0,-45,0,0" Visibility="Visible" Background="#3A9CFF" Panel.ZIndex="1">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <materialDesign:PackIcon Kind="WebOff" Width="20" Height="20"/>
+                    <TextBlock Text="No connection" FontWeight="SemiBold" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="0" Panel.ZIndex="0">
+                <TextBlock x:Name="ts"/>
                 <ListView x:Name="mes" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled" d:ItemsSource="{d:SampleData ItemCount=15}" MinHeight="538" VerticalAlignment="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom">
                         <ListView.ItemTemplate>
                             <DataTemplate>

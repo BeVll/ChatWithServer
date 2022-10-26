@@ -131,9 +131,10 @@ namespace ChatWithBot
                     }
                     List<UserLocal> ul = lv.Items.Cast<UserLocal>().ToList();
                     UserLocal userLocal = ul.Where(s => s.Id == current_user.Id).First();
-                    userLocal.LastMessage = messageNews[messageNews.Count - 1].Title;
+                    if(messageNews.Count > 0)
+                        userLocal.LastMessage = messageNews[messageNews.Count - 1].Title;
                     ul[ul.IndexOf(userLocal)] = userLocal;
-
+                    con.UpdateLastMessage(userLocal);
                     mes.ItemsSource = messageNews;
                     mes.SelectedIndex = mes.Items.Count - 1;
                     mes.ScrollIntoView(mes.SelectedItem);
@@ -158,33 +159,22 @@ namespace ChatWithBot
         {
             if (client.stream != null)
             {
-                if (client.client.Connected)
+                UserLocal local = lv.SelectedItem as UserLocal;
+                if (local != null && TBMes.Text != string.Empty && server_connected == true)
                 {
-                    UserLocal local = lv.SelectedItem as UserLocal;
-                    if (local != null && TBMes.Text != string.Empty && server_connected == true)
-                    {
-                        Message message2 = new Message();
-                        message2.Sender_Id = User.Id;
-                        message2.Created = DateTime.Now;
-                        message2.Title = TBMes.Text;
-                        message2.Destination_Id = local.Id;
-                        client.SendMessage(message2.Title, message2.Destination_Id);
-                        con.localdb.Messages.Add(message2);
-                        con.localdb.SaveChanges();
-                        UpdateMessage();
-                        TBMes.Text = "";
-                    }
+                    Message message2 = new Message();
+                    message2.Sender_Id = User.Id;
+                    message2.Created = DateTime.Now;
+                    message2.Title = TBMes.Text;
+                    message2.Destination_Id = local.Id;
+                    message2.For_User = User.Id;
+                    client.SendMessage(message2.Title, message2.Destination_Id);
+                    con.localdb.Messages.Add(message2);
+                    con.localdb.SaveChanges();
+                    UpdateMessage();
+                    TBMes.Text = "";
                 }
-                else
-                {
-                    server_connected = false;
-                    Thread ShowAnimAlert = new Thread(ShowNoCon);
-                    ShowAnimAlert.Start();
-                    Thread reconnect = new Thread(Reconnect);
-                    reconnect.Start();
-                    threads.Add(reconnect);
-                    threads.Add(ShowAnimAlert);
-                }
+
             }
         }
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -278,8 +268,6 @@ namespace ChatWithBot
                 }
                 else if (mes == "disconnected")
                 {
-                    Thread show = new Thread(WriteThreads);
-                    show.Start();
                     server_connected = false;
                     Thread ShowAnimAlert = new Thread(ShowNoCon);
                     ShowAnimAlert.Start();
@@ -306,6 +294,7 @@ namespace ChatWithBot
                     message2.Created = DateTime.Now;
                     message2.Title = message;
                     message2.Destination_Id = id_to;
+                    message2.For_User = User.Id;
                     con.localdb.Messages.Add(message2);
                     con.localdb.SaveChanges();
                     //if(con.GetUsesrLocal(User.Id).Where(s => s.Id == id_from).FirstOrDefault() == null)
@@ -352,16 +341,6 @@ namespace ChatWithBot
             MainWindow w = Application.Current.MainWindow as MainWindow;
             w.WindowState = WindowState.Minimized;
         }
-        private void WriteThreads()
-        {
-            ProcessThreadCollection currentThreads = Process.GetCurrentProcess().Threads;
-
-            foreach (ProcessThread thread in currentThreads)
-            {
-                string str = thread.StartAddress + " " + thread.Id + "" + thread.ThreadState;
-                File.WriteAllText("/log/log.txt", str);
-
-            }
-        }
+        
     }
 }

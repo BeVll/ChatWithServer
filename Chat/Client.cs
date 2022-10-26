@@ -82,7 +82,7 @@ namespace Chat
         {
             try
             {
-                byte[] data = new byte[64];
+                byte[] data = new byte[1000];
                 StringBuilder builder = new StringBuilder();
                 int bytes = 0;
 

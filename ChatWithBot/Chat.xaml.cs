@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -30,6 +31,7 @@ namespace ChatWithBot
         User User { get; set; }
         DBConnector con = new DBConnector();
         bool server_connected = false;
+        List<Thread> threads = new List<Thread>();
         public Chat(User user)
         {
             this.User = user;
@@ -43,6 +45,7 @@ namespace ChatWithBot
                 server_connected = true;
                 Thread read = new Thread(ReadServer);
                 read.Start();
+                threads.Add(read);
             }
             else
             {
@@ -50,6 +53,8 @@ namespace ChatWithBot
                 ShowAnimAlert.Start();
                 Thread reconnect = new Thread(Reconnect);
                 reconnect.Start();
+                threads.Add(reconnect);
+                threads.Add(ShowAnimAlert);
             }
 
         }
@@ -57,13 +62,18 @@ namespace ChatWithBot
         {
             while(server_connected == false)
             {
-                if (client.Connect(User) == "Correct")
+                if (client != null)
                 {
-                    server_connected = true;
-                    Thread read = new Thread(ReadServer);
-                    read.Start();
-                    Thread ShowAnimAlert = new Thread(CloseNoCon);
-                    ShowAnimAlert.Start();
+                    if (client.Connect(User) == "Correct")
+                    {
+                        server_connected = true;
+                        Thread read = new Thread(ReadServer);
+                        read.Start();
+                        Thread ShowAnimAlert = new Thread(CloseNoCon);
+                        ShowAnimAlert.Start();
+                        threads.Add(read);
+                        threads.Add(ShowAnimAlert);
+                    }
                 }
                 Thread.Sleep(500);
             }
@@ -119,6 +129,10 @@ namespace ChatWithBot
                         }
                         messageNews.Add(messageNew);
                     }
+                    List<UserLocal> ul = lv.Items.Cast<UserLocal>().ToList();
+                    UserLocal userLocal = ul.Where(s => s.Id == current_user.Id).First();
+                    userLocal.LastMessage = messageNews[messageNews.Count - 1].Title;
+                    ul[ul.IndexOf(userLocal)] = userLocal;
 
                     mes.ItemsSource = messageNews;
                     mes.SelectedIndex = mes.Items.Count - 1;
@@ -142,36 +156,41 @@ namespace ChatWithBot
         }
         private void SendMessage()
         {
-            if (client.stream.CanWrite)
+            if (client.stream != null)
             {
-                UserLocal local = lv.SelectedItem as UserLocal;
-                if (local != null && TBMes.Text != string.Empty && server_connected == true)
+                if (client.client.Connected)
                 {
-                    Message message2 = new Message();
-                    message2.Sender_Id = User.Id;
-                    message2.Created = DateTime.Now;
-                    message2.Title = TBMes.Text;
-                    message2.Destination_Id = local.Id;
-                    client.SendMessage(message2.Title, message2.Destination_Id);
-                    con.localdb.Messages.Add(message2);
-                    con.localdb.SaveChanges();
-                    UpdateMessage();
-                    TBMes.Text = "";
+                    UserLocal local = lv.SelectedItem as UserLocal;
+                    if (local != null && TBMes.Text != string.Empty && server_connected == true)
+                    {
+                        Message message2 = new Message();
+                        message2.Sender_Id = User.Id;
+                        message2.Created = DateTime.Now;
+                        message2.Title = TBMes.Text;
+                        message2.Destination_Id = local.Id;
+                        client.SendMessage(message2.Title, message2.Destination_Id);
+                        con.localdb.Messages.Add(message2);
+                        con.localdb.SaveChanges();
+                        UpdateMessage();
+                        TBMes.Text = "";
+                    }
                 }
-            }
-            else
-            {
-                server_connected = false;
-                Thread ShowAnimAlert = new Thread(ShowNoCon);
-                ShowAnimAlert.Start();
-                Thread reconnect = new Thread(Reconnect);
-                reconnect.Start();
+                else
+                {
+                    server_connected = false;
+                    Thread ShowAnimAlert = new Thread(ShowNoCon);
+                    ShowAnimAlert.Start();
+                    Thread reconnect = new Thread(Reconnect);
+                    reconnect.Start();
+                    threads.Add(reconnect);
+                    threads.Add(ShowAnimAlert);
+                }
             }
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             User user = con.GetUser(SearchUser.Text);
-            if(user != null)
+            if(user != null && user.Id != User.Id)
             {
                 con.AddLocalUser(user, User.Id);
                 lv.ItemsSource = con.GetUsesrLocal(User.Id);
@@ -181,6 +200,7 @@ namespace ChatWithBot
                 alerttext.Text = $"User {SearchUser.Text} not found";
                 Thread ShowAnimAlert = new Thread(ShowAnimation);
                 ShowAnimAlert.Start();
+                threads.Add(ShowAnimAlert);
             }
         }
         private void ShowAnimation()
@@ -234,6 +254,7 @@ namespace ChatWithBot
         {
             Thread thread = new Thread(() => CloseAnimation());
             thread.Start();
+            threads.Add(thread);
         }
 
         private void SendMes_Click(object sender, RoutedEventArgs e)
@@ -242,51 +263,104 @@ namespace ChatWithBot
         }
         private void ReadServer()
         {
-            bool check = true;
-            while (check)
+            while (server_connected)
             {
-                if (client.stream.DataAvailable)
+
+                string mes = client.GetMessage();
+                mes = mes.Replace("\0", "");
+                if (mes == "Server is closed")
                 {
-                    string mes = client.GetMessage();
-                    mes = mes.Replace("\0", "");
-                    if (mes == "Server is closed")
-                    {
-                        check = false;
-                        alerttext.Text = "Server is closed. Sending and receiving messages does not work!";
-                        Thread ShowAnimAlert = new Thread(ShowAnimation);
-                        ShowAnimAlert.Start();
-                    }
-                    else if (mes == "disconnected")
-                    {
-                        server_connected = false;
-                        Thread ShowAnimAlert = new Thread(ShowNoCon);
-                        ShowAnimAlert.Start();
-                        Thread reconnect = new Thread(Reconnect);
-                        reconnect.Start();
-                    }
-                    else
-                    {
-
-                        Regex regex = new Regex("(\\w+) \\[to (\\w+)] \\[from (\\w+)]");
-
-                        Match match = regex.Match(mes);
-                        string message = match.Groups[1].Value;
-                        int id_from = Convert.ToInt32(match.Groups[3].Value);
-                        int id_to = Convert.ToInt32(match.Groups[2].Value);
-                        Message message2 = new Message();
-                        message2.Sender_Id = id_from;
-                        message2.Created = DateTime.Now;
-                        message2.Title = message;
-                        message2.Destination_Id = id_to;
-                        con.localdb.Messages.Add(message2);
-                        con.localdb.SaveChanges();
-                        UpdateMessage();
-                    }
+                    server_connected = false;
+                    alerttext.Text = "Server is closed. Sending and receiving messages does not work!";
+                    Thread ShowAnimAlert = new Thread(ShowAnimation);
+                    ShowAnimAlert.Start();
+                    threads.Add(ShowAnimAlert);
+                }
+                else if (mes == "disconnected")
+                {
+                    Thread show = new Thread(WriteThreads);
+                    show.Start();
+                    server_connected = false;
+                    Thread ShowAnimAlert = new Thread(ShowNoCon);
+                    ShowAnimAlert.Start();
+                    Thread reconnect = new Thread(Reconnect);
+                    reconnect.Start();
+                    threads.Add(ShowAnimAlert);
+                    threads.Add(reconnect);
+                }
+                else if (mes == "clossing")
+                {
+                    server_connected = false;
                 }
                 else
                 {
-                    Thread.Sleep(500);
+
+                    Regex regex = new Regex("(.*) \\[to (\\w+)] \\[from (\\w+)]");
+
+                    Match match = regex.Match(mes);
+                    string message = match.Groups[1].Value;
+                    int id_from = Convert.ToInt32(match.Groups[3].Value);
+                    int id_to = Convert.ToInt32(match.Groups[2].Value);
+                    Message message2 = new Message();
+                    message2.Sender_Id = id_from;
+                    message2.Created = DateTime.Now;
+                    message2.Title = message;
+                    message2.Destination_Id = id_to;
+                    con.localdb.Messages.Add(message2);
+                    con.localdb.SaveChanges();
+                    //if(con.GetUsesrLocal(User.Id).Where(s => s.Id == id_from).FirstOrDefault() == null)
+                    //{
+                    //    con.AddLocalUser(con.GetUserFromId(id_from), User.Id);
+
+                    //}
+                    UpdateMessage();
                 }
+
+            }
+        }
+        
+
+        private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            MainWindow w = Application.Current.MainWindow as MainWindow;
+            w.DragMove();
+        }
+       
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            MainWindow w = Application.Current.MainWindow as MainWindow;
+            client.SendMessage("clossing");
+            
+            client.Close();
+            client.stream.Close();
+            client = null;
+            w.Close();
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            MainWindow w = Application.Current.MainWindow as MainWindow;
+            if (w.WindowState == WindowState.Maximized)
+                w.WindowState = WindowState.Normal;
+            else
+                w.WindowState = WindowState.Maximized;
+        }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            MainWindow w = Application.Current.MainWindow as MainWindow;
+            w.WindowState = WindowState.Minimized;
+        }
+        private void WriteThreads()
+        {
+            ProcessThreadCollection currentThreads = Process.GetCurrentProcess().Threads;
+
+            foreach (ProcessThread thread in currentThreads)
+            {
+                string str = thread.StartAddress + " " + thread.Id + "" + thread.ThreadState;
+                File.WriteAllText("/log/log.txt", str);
+
             }
         }
     }

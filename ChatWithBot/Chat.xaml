@@ -6,69 +6,93 @@
       xmlns:local="clr-namespace:ChatWithBot"
       mc:Ignorable="d" 
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-      d:MinHeight="578"  d:MinWidth="1000" 
+      d:MinHeight="600"  d:MinWidth="1000" 
       
       Title="Chat">
-    
-    <Grid Background="#2E3238">
-        
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="280"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <StackPanel Grid.Column="0" Background="#393E46">
-            <Grid>
-                <TextBox x:Name="SearchUser" materialDesign:HintAssist.Hint="Enter login..." Foreground="#9F9FA0" Padding="5,9,45,0" FontSize="16" Margin="0,0,0,0"/>
-                <Button Style="{DynamicResource MaterialDesignFlatButton}" HorizontalAlignment="Right" Padding="5" Width="40" Height="40" Click="Button_Click">
+    <StackPanel>
+        <Grid Height="22" VerticalAlignment="Top" Background="#222831" MouseDown="Grid_MouseDown" Panel.ZIndex="1">
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Kind="FileDocument" Foreground="#D7EDF6" Margin="3,2,0,0"/>
+                <TextBlock Text="ChatApp" Foreground="#D7EDF6" VerticalAlignment="Center" FontWeight="SemiBold" Margin="3,0,0,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Style="{DynamicResource MaterialDesignFlatButton}" Padding="0" VerticalAlignment="Center" Click="Button_Click_4">
                     <Button.Content>
-                        <materialDesign:PackIcon Kind="UserPlus" Width="30" Height="30" Margin="0,0" Foreground="#3A9CFF"/>
+                        <materialDesign:PackIcon Kind="Minus" Foreground="#D7EDF6" Height="18" Width="18" Margin="3,0"/>
                     </Button.Content>
                 </Button>
-            </Grid>
-            <ListView x:Name="lv" d:ItemsSource="{d:SampleData ItemCount=15}" Margin="0" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled"  SelectionChanged="lv_SelectionChanged">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="-8" Width="280" >
-                            <Border Height="1" VerticalAlignment="Top" Background="#222831"/>
-                        <StackPanel Orientation="Horizontal" Margin="3">
-                            
-                            <Border CornerRadius="15" Width="45" Height="45" Margin="5,0,0,0" Padding="0">
-                                <Border.Background>
-                                    <ImageBrush Stretch="UniformToFill" ImageSource="{Binding Image}"/>
-                                </Border.Background>
-                            </Border>
-                            <StackPanel Margin="10,10">
-                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="15"/>
-                                <TextBlock Text="{Binding LastMessage}" FontSize="12" Foreground="#9F9FA0"/>
-                            </StackPanel>
-                        </StackPanel>
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                <Button Style="{DynamicResource MaterialDesignFlatButton}" Padding="0" VerticalAlignment="Center" Click="Button_Click_3" Cursor="Hand">
+                    <Button.Content>
+                        <materialDesign:PackIcon Kind="SquareOutline" Foreground="#D7EDF6" Height="15" Width="15" Margin="3,0"/>
+                    </Button.Content>
+                </Button>
+                <Button Style="{DynamicResource MaterialDesignFlatButton}" Padding="0" VerticalAlignment="Center" Click="Button_Click_2">
+                    <Button.Content>
+                        <materialDesign:PackIcon Kind="Close" Foreground="#D7EDF6" Height="18" Width="18" Margin="3,0"/>
+                    </Button.Content>
+                </Button>
 
-        </StackPanel>
-        <Border Width="2" Grid.Column="1" HorizontalAlignment="Left" Background="#222831"/>
-        <Grid Grid.Column="1" Margin="2,0,0,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="40"/>
-            </Grid.RowDefinitions>
-            <Grid x:Name="NoCon" Height="40" VerticalAlignment="Top" Margin="0,-45,0,0" Visibility="Visible" Background="#3A9CFF" Panel.ZIndex="1">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <materialDesign:PackIcon Kind="WebOff" Width="20" Height="20"/>
-                    <TextBlock Text="No connection" FontWeight="SemiBold" VerticalAlignment="Center" Margin="5,0,0,0"/>
-                </StackPanel>
-            </Grid>
-            <Grid Grid.Row="0" Panel.ZIndex="0">
-                <TextBlock x:Name="ts"/>
-                <ListView x:Name="mes" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled" d:ItemsSource="{d:SampleData ItemCount=15}" MinHeight="538" VerticalAlignment="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom">
+            </StackPanel>
+        </Grid>
+        <Grid Background="#2E3238">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="280"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Background="#393E46">
+                <Grid>
+                    <TextBox x:Name="SearchUser" materialDesign:HintAssist.Hint="Enter login..." Foreground="#9F9FA0" Padding="5,9,45,0" FontSize="16" Margin="0,0,0,0"/>
+                    <Button Style="{DynamicResource MaterialDesignFlatButton}" HorizontalAlignment="Right" Padding="5" Width="40" Height="40" Click="Button_Click">
+                        <Button.Content>
+                            <materialDesign:PackIcon Kind="UserPlus" Width="30" Height="30" Margin="0,0" Foreground="#3A9CFF"/>
+                        </Button.Content>
+                    </Button>
+                </Grid>
+                <ListView x:Name="lv" d:ItemsSource="{d:SampleData ItemCount=15}" Margin="0" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled"  SelectionChanged="lv_SelectionChanged">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="-8" Width="280" >
+                                <Border Height="1" VerticalAlignment="Top" Background="#222831"/>
+                                <StackPanel Orientation="Horizontal" Margin="3">
+
+                                    <Border CornerRadius="15" Width="45" Height="45" Margin="5,0,0,0" Padding="0">
+                                        <Border.Background>
+                                            <ImageBrush Stretch="UniformToFill" ImageSource="{Binding Image}"/>
+                                        </Border.Background>
+                                    </Border>
+                                    <StackPanel Margin="10,10">
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="15"/>
+                                        <TextBlock Text="{Binding LastMessage}" FontSize="12" Foreground="#9F9FA0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+            </StackPanel>
+            <Border Width="2" Grid.Column="1" HorizontalAlignment="Left" Background="#222831"/>
+            <Grid Grid.Column="1" Margin="2,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
+                <Grid x:Name="NoCon" Height="40" VerticalAlignment="Top" Margin="0,-45,0,0" Visibility="Visible" Background="#3A9CFF" Panel.ZIndex="1">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <materialDesign:PackIcon Kind="WebOff" Width="20" Height="20"/>
+                        <TextBlock Text="No connection" FontWeight="SemiBold" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="0" Panel.ZIndex="0">
+                    <TextBlock x:Name="ts"/>
+                    <ListView x:Name="mes" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled" d:ItemsSource="{d:SampleData ItemCount=15}" MinHeight="538" VerticalAlignment="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Border MaxWidth="400"  Padding="5" Margin="10" HorizontalAlignment="{Binding Alig}" Background="{Binding Color}">
                                     <StackPanel>
-                                    <TextBlock Text="{Binding Title}" TextWrapping="Wrap"  MaxWidth="400" TextAlignment="Left" Margin="0,0,0,1" FontSize="12"/>
+                                        <TextBlock Text="{Binding Title}" TextWrapping="Wrap"  MaxWidth="400" TextAlignment="Left" Margin="0,0,0,1" FontSize="12"/>
                                         <TextBlock Text="{Binding Created, StringFormat=f}" FontSize="8" Foreground="#818282" VerticalAlignment="Bottom" TextAlignment="{Binding Alig}"/>
                                     </StackPanel>
                                 </Border>
@@ -77,35 +101,36 @@
                     </ListView>
                 </Grid>
                 <StackPanel Grid.Row="1">
-                <Border Height="2" Background="#222831"/>
+                    <Border Height="2" Background="#222831"/>
+                    <Grid>
+                        <TextBox  x:Name="TBMes"  Style="{DynamicResource MaterialDesignTextBox}" materialDesign:HintAssist.Hint="Enter message..." Foreground="#D7EDF6" FontWeight="SemiBold" Padding="10,11,45,0" Height="40" KeyDown="TextBox_KeyDown"/>
+                        <Button x:Name="SendMes" Style="{DynamicResource MaterialDesignIconButton}" HorizontalAlignment="Right" Padding="0" Margin="10,05" Width="25" Height="25" Click="SendMes_Click" Cursor="Hand">
+                            <Button.Content>
+                                <materialDesign:PackIcon Kind="SendCircle" Width="25" Height="25" Margin="0,0" Foreground="#FBC02D"/>
+                            </Button.Content>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+
+            </Grid>
+            <Border x:Name="alertbox" Grid.Column="2" Margin="15" Background="#393E46" Width="220" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="80" BorderBrush="Gray" BorderThickness="1">
                 <Grid>
-                    <TextBox  x:Name="TBMes"  Style="{DynamicResource MaterialDesignTextBox}" materialDesign:HintAssist.Hint="Enter message..." Foreground="#D7EDF6" FontWeight="SemiBold" Padding="10,11,45,0" Height="40" KeyDown="TextBox_KeyDown"/>
-                    <Button x:Name="SendMes" Style="{DynamicResource MaterialDesignIconButton}" HorizontalAlignment="Right" Padding="0" Margin="10,05" Width="25" Height="25" Click="SendMes_Click" Cursor="Hand">
+                    <Button HorizontalAlignment="Right" VerticalAlignment="Top" Padding="0" Width="20" Height="20" Style="{DynamicResource MaterialDesignIconButton}" Click="Button_Click_1">
                         <Button.Content>
-                            <materialDesign:PackIcon Kind="SendCircle" Width="25" Height="25" Margin="0,0" Foreground="#FBC02D"/>
+                            <materialDesign:PackIcon Kind="Close"  Width="20" Height="20"/>
                         </Button.Content>
                     </Button>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Notifications" Foreground="#EBEBEC" Width="15" Height="15" Margin="3,3,3,0"/>
+                        <TextBlock x:Name="alerttitle" Text="Alert" Foreground="#EBEBEC" FontWeight="Bold" Margin="0,2,2,0" TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <TextBlock x:Name="alerttext" FontSize="10" VerticalAlignment="Top" Text="Its alert box" Foreground="#788292" Margin="5,20,5,5" TextWrapping="Wrap"/>
                 </Grid>
-                </StackPanel>
-
+                <Border.Effect>
+                    <DropShadowEffect ShadowDepth="0" Color="DarkGray" BlurRadius="15"/>
+                </Border.Effect>
+            </Border>
         </Grid>
-        <Border x:Name="alertbox" Grid.Column="2" Margin="15" Background="#393E46" Width="220" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="80" BorderBrush="Gray" BorderThickness="1">
-            <Grid>
-                <Button HorizontalAlignment="Right" VerticalAlignment="Top" Padding="0" Width="20" Height="20" Style="{DynamicResource MaterialDesignIconButton}" Click="Button_Click_1">
-                    <Button.Content>
-                        <materialDesign:PackIcon Kind="Close"  Width="20" Height="20"/>
-                    </Button.Content>
-                </Button>
-                <StackPanel Orientation="Horizontal">
-                    <materialDesign:PackIcon Kind="Notifications" Foreground="#EBEBEC" Width="15" Height="15" Margin="3,3,3,0"/>
-                    <TextBlock x:Name="alerttitle" Text="Alert" Foreground="#EBEBEC" FontWeight="Bold" Margin="0,2,2,0" TextWrapping="Wrap"/>
-                </StackPanel>
-
-                <TextBlock x:Name="alerttext" FontSize="10" VerticalAlignment="Top" Text="Its alert box" Foreground="#788292" Margin="5,20,5,5" TextWrapping="Wrap"/>
-            </Grid>
-            <Border.Effect>
-                <DropShadowEffect ShadowDepth="0" Color="DarkGray" BlurRadius="15"/>
-            </Border.Effect>
-        </Border>
-    </Grid>
+    </StackPanel>
 </Page>

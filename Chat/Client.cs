@@ -22,8 +22,8 @@ namespace Chat
             try
             {
                 this.user = user;
-                client = new TcpClient();
-                client.Connect(IPAddress.Parse(address), port);
+                client = new TcpClient();    
+                client.ConnectAsync(IPAddress.Parse(address), port).Wait(1000);
                 stream = client.GetStream();
                 Log($"User {user.Login} connected to server");
                 SendMessage($"/reg id:{user.Id}");

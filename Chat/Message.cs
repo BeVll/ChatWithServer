@@ -16,6 +16,7 @@ namespace Chat
         public DateTime Created { get; set; }
         public int Sender_Id { get; set; }
         public int Destination_Id { get; set; }
+        public int For_User { get; set; }
 
     }
 }

@@ -40,19 +40,41 @@ namespace Chat
                     int bytes = Stream.Read(data_from_client, 0, data_from_client.Length);
                     string str = Encoding.Unicode.GetString(data_from_client);
                     str = str.Replace("\0", "");
-                    Regex regex = new Regex("(\\w+) \\[from (\\w+)\\] \\[to (\\w+)\\]");
+                    if (str == "disconnecting")
+                    {
+                        server.SendMessage("disconnecting", Id);
+                        Client.Close();
+                        Stream.Close();
+                        server.users.Remove(this);
+                        Log($"Server: User {Id} is disconnected!");
+                        return $"Server: User {Id} is disconnected!";
+                    }
+                    else if (str == "clossing")
+                    {
+                        server.SendMessage("clossing", Id);
+                        Client.Close();
+                        Stream.Close();
+                        server.users.Remove(this);
+                        Log($"Server: User {Id} is disconnected!");
+                        return $"Server: User {Id} is disconnected!";
+                    }
+                    else
+                    {
+                        Regex regex = new Regex("(.*) \\[from (\\w+)\\] \\[to (\\w+)\\]");
 
-                    Match match = regex.Match(str);
-                    string mes = match.Groups[1].Value;
-                    int id_from = Convert.ToInt32(match.Groups[2].Value);
-                    int id_to = Convert.ToInt32(match.Groups[3].Value);
-                    server.SendMessage(mes, id_from, id_to);
-                    return str;
+                        Match match = regex.Match(str);
+                        string mes = match.Groups[1].Value;
+                        int id_from = Convert.ToInt32(match.Groups[2].Value);
+                        int id_to = Convert.ToInt32(match.Groups[3].Value);
+                        server.SendMessage(mes, id_from, id_to);
+                        return str;
+                    }
                 }
                 else
                 {
                     Client.Close();
                     Stream.Close();
+                    server.users.Remove(this);
                     Log($"Server: User {Id} is disconnected!");
                     return $"Server: User {Id} is disconnected!";
                 }

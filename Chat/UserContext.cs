@@ -19,7 +19,7 @@ namespace Chat
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySQL(@"Server=sql11.freemysqlhosting.net;Database=sql11528448;Uid=sql11528448;Pwd=EKuyAhSwwq;");
+            optionsBuilder.UseMySQL(@"Server=sql11.freemysqlhosting.net;Database=sql11528448;Uid=sql11528448;Pwd=EKuyAhSwwq;CharSet=utf8;");
         }
     }
 }

@@ -31,6 +31,7 @@ namespace Chat
         {
             List<Message> messages = localdb.Messages.Where(s => s.Sender_Id == user1_id && s.Destination_Id == user2_id).ToList();
             messages.AddRange(localdb.Messages.Where(s => s.Sender_Id == user2_id && s.Destination_Id == user1_id).ToList());
+            messages = messages.Where(s => s.For_User == user1_id).ToList();
             messages = messages.OrderBy(s => s.Created).ToList();
             return messages;
         }
@@ -58,6 +59,11 @@ namespace Chat
             userLocal.Name = user.Name;
             userLocal.Image = user.Image;
             localdb.Users.Add(userLocal);
+            localdb.SaveChanges();
+        }
+        public void UpdateLastMessage(UserLocal user)
+        {
+            localdb.Users.Update(user);
             localdb.SaveChanges();
         }
     }
